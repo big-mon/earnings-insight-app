@@ -3,7 +3,6 @@ from typing import Dict, Optional
 import pandas as pd
 from models.financial_data import FinancialData
 
-
 def format_financial_value(value: float) -> str:
     """
     財務数値を見やすい形式にフォーマット
@@ -20,7 +19,6 @@ def format_financial_value(value: float) -> str:
         return f"¥{value/1_000:.1f}K"
     else:
         return f"¥{value:.2f}"
-
 
 def get_normalized_financial_data(ticker: str, period: str = "quarterly") -> Optional[Dict]:
     """
