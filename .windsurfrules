@@ -1,13 +1,46 @@
-# Gitの使用に関して
+# バージョン管理
+## Git運用
 - 開発はfeatureブランチで実施
 - mainブランチへの直接プッシュは禁止
-- 何らかの変更を加えた場合は適時にコミットを取る
+- 変更後は適時にコミット
 - プルリクエスト必須
-- リポジトリへの操作はGitHub MCPを使用する
-- リモートブランチへのコミットは禁止し、ローカルブランチのみで作業する
+- リモートブランチへの直接コミット禁止
+
+## コミットメッセージ
+- フォーマット: `<type>: <subject>`
+  - 例: `feat: グラフ表示機能を追加`
+- タイプ一覧:
+  - feat: 新機能
+  - fix: バグ修正
+  - docs: ドキュメント更新
+  - style: フォーマット変更
+  - refactor: リファクタリング
+  - test: テスト関連
+
+# コード品質
+## ファイル構造
+- UI関連: `src/ui/`
+- データ処理: `src/data/`
+- ユーティリティ: `src/utils/`
+- ドキュメント: `docs/`
+
+## コーディング規約
+- 関数・クラス: docstring必須
+- 変数名: 説明的で具体的な命名
+- 関数長: 50行以内を推奨
+- ファイルサイズ: 500行以内を推奨
 
 # 財務指標
-- EPSなど発行株式数を考慮する指標は、希薄化後発行株式数を基準とする
+- EPS/BPS: 希薄化後発行株式数を使用
+- 日付フォーマット: `YYYY/MM`
 
-# 利用しているライブラリのドキュメント
-- yfinance https://yfinance-python.org/reference/index.html
+# 依存関係
+## 主要ライブラリ
+- yfinance: 財務データ取得
+- Streamlit: UI構築
+- Plotly: グラフ描画
+
+# 参考資料
+- [yfinanceドキュメント](https://yfinance-python.org/reference/index.html)
+- [Streamlitドキュメント](https://docs.streamlit.io/)
+- [Plotlyドキュメント](https://plotly.com/python/)
