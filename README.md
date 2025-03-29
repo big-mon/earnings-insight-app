@@ -22,6 +22,11 @@ cd earnings-insight-app
 
 2. 必要なパッケージをインストール
 ```bash
+# 仮想環境の作成（推奨）
+python -m venv .venv
+.\.venv\Scripts\activate
+
+# パッケージのインストール
 pip install -r requirements.txt
 ```
 
