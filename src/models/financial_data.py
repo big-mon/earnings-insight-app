@@ -67,15 +67,20 @@ class FinancialData:
             # 一株あたり指標の計算
             df["EPS"] = df["純利益"] / df["発行済株式数"]
 
-            # BPSの計算（総資産 - 総負債）/ 発行済株式数
-            total_assets = balance.loc["Total Assets"] if "Total Assets" in balance.index else None
-            total_liabilities = balance.loc["Total Liabilities Net Minority Interest"] if "Total Liabilities Net Minority Interest" in balance.index else None
-
-            if total_assets is not None and total_liabilities is not None:
-                df["BPS"] = (total_assets - total_liabilities) / df["発行済株式数"]
+            # BPSの計算（純資産 / 発行済株式数）
+            stockholder_equity = balance.loc["Total Stockholder Equity"] if "Total Stockholder Equity" in balance.index else None
+            if stockholder_equity is not None:
+                df["BPS"] = stockholder_equity / df["発行済株式数"]
             else:
-                print("BPSの計算に必要なデータが取得できません")
-                return None
+                # 代替計算：（総資産 - 総負債）/ 発行済株式数
+                total_assets = balance.loc["Total Assets"] if "Total Assets" in balance.index else None
+                total_liabilities = balance.loc["Total Liabilities Net Minority Interest"] if "Total Liabilities Net Minority Interest" in balance.index else None
+
+                if total_assets is not None and total_liabilities is not None:
+                    df["BPS"] = (total_assets - total_liabilities) / df["発行済株式数"]
+                else:
+                    print("BPSの計算に必要なデータが取得できません")
+                    return None
 
             return df
 
