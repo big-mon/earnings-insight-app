@@ -25,26 +25,35 @@ class FinancialData:
             pd.DataFrame: 財務データ
         """
         try:
-            if period == "quarterly":
-                financials = self.stock.quarterly_financials
-                balance_sheet = self.stock.quarterly_balance_sheet
-                cashflow = self.stock.quarterly_cashflow
-            else:
-                financials = self.stock.financials
-                balance_sheet = self.stock.balance_sheet
-                cashflow = self.stock.cashflow
+            # 財務諸表の取得
+            income = self.stock.income_stmt if period == "annual" else self.stock.quarterly_income_stmt
+            balance = self.stock.balance_sheet if period == "annual" else self.stock.quarterly_balance_sheet
+            cash = self.stock.cashflow if period == "annual" else self.stock.quarterly_cashflow
 
-            if financials.empty or balance_sheet.empty or cashflow.empty:
-                raise ValueError(f"財務データが取得できません: {self.ticker}")
+            if income.empty or balance.empty or cash.empty:
+                print(f"財務データが不完全です: income={not income.empty}, balance={not balance.empty}, cash={not cash.empty}")
+                return None
 
             # 必要なデータを抽出
             data = {
-                "売上高": financials.loc["Total Revenue"] if "Total Revenue" in financials.index else None,
-                "営業利益": financials.loc["Operating Income"] if "Operating Income" in financials.index else None,
-                "純利益": financials.loc["Net Income"] if "Net Income" in financials.index else None,
-                "営業キャッシュフロー": cashflow.loc["Operating Cash Flow"] if "Operating Cash Flow" in cashflow.index else None,
-                "発行済株式数": balance_sheet.loc["Shares Outstanding"] if "Shares Outstanding" in balance_sheet.index else None,
+                "売上高": income.loc["Total Revenue"] if "Total Revenue" in income.index else None,
+                "営業利益": income.loc["Operating Income"] if "Operating Income" in income.index else None,
+                "純利益": income.loc["Net Income"] if "Net Income" in income.index else None,
+                "営業キャッシュフロー": cash.loc["Operating Cash Flow"] if "Operating Cash Flow" in cash.index else None,
             }
+
+            # 株式数の取得（infoから取得）
+            try:
+                shares = self.stock.info.get("sharesOutstanding")
+                if shares:
+                    # 全期間で同じ株式数を使用
+                    data["発行済株式数"] = pd.Series([shares] * len(data["売上高"].index), index=data["売上高"].index)
+                else:
+                    print("発行済株式数が取得できません")
+                    return None
+            except Exception as e:
+                print(f"株式数の取得に失敗しました: {str(e)}")
+                return None
 
             # Noneの値をチェック
             if any(v is None for v in data.values()):
@@ -57,10 +66,16 @@ class FinancialData:
 
             # 一株あたり指標の計算
             df["EPS"] = df["純利益"] / df["発行済株式数"]
-            df["BPS"] = (balance_sheet.loc["Total Stockholder Equity"] if "Total Stockholder Equity" in balance_sheet.index else balance_sheet.loc["Total Assets"] - balance_sheet.loc["Total Liabilities Net Minority Interest"]) / df["発行済株式数"]
 
-            # インデックスを日付型に変換
-            df.index = pd.to_datetime(df.index)
+            # BPSの計算（総資産 - 総負債）/ 発行済株式数
+            total_assets = balance.loc["Total Assets"] if "Total Assets" in balance.index else None
+            total_liabilities = balance.loc["Total Liabilities Net Minority Interest"] if "Total Liabilities Net Minority Interest" in balance.index else None
+
+            if total_assets is not None and total_liabilities is not None:
+                df["BPS"] = (total_assets - total_liabilities) / df["発行済株式数"]
+            else:
+                print("BPSの計算に必要なデータが取得できません")
+                return None
 
             return df
 
