@@ -2,7 +2,7 @@
 import streamlit as st
 from data.data_fetcher import DataFetcher
 from data.data_processor import DataProcessor
-from data.plot_manager import PlotManager
+from plots.plot_manager import PlotManager
 from utils.constants import (
     PERIOD_QUARTERLY, PERIOD_ANNUAL,
     APP_TITLE, APP_DESCRIPTION, APP_ICON,

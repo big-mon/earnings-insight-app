@@ -3,7 +3,6 @@ from typing import Dict, List, Optional, Union
 import pandas as pd
 from datetime import datetime
 
-
 class FinancialDataModel:
     """財務データモデル"""
     dates: List[datetime]
@@ -54,12 +53,11 @@ class FinancialDataModel:
             "operating_margin": self.operating_margin,
             "operating_cash_flow_per_share": self.operating_cash_flow_per_share
         }
-        
+
         if self.dps is not None:
             result["dps"] = self.dps
-            
-        return result
 
+        return result
 
 class ChartConfig:
     """チャート設定"""
@@ -68,7 +66,7 @@ class ChartConfig:
     y2_title: Optional[str]
     primary_data: Dict[str, List[float]]
     secondary_data: Optional[Dict[str, List[float]]]
-    
+
     def __init__(
         self,
         title: str,

@@ -5,7 +5,7 @@ import pandas as pd
 import numpy as np
 from datetime import datetime
 import plotly.graph_objects as go
-from data.plot_manager import PlotManager
+from plots.plot_manager import PlotManager
 from utils.models import ChartConfig, FinancialDataModel
 
 
@@ -51,17 +51,17 @@ class TestPlotManager:
                 "発行済株式数": [1000, 1000, 1000, 1000]
             }
         )
-        
+
         # チャート作成
         fig = PlotManager.create_financial_chart(
             dates=sample_financial_data.dates,
             config=config
         )
-        
+
         # 結果の検証
         assert isinstance(fig, go.Figure)
         assert len(fig.data) == 4  # 4つのトレースがあることを確認
-        
+
         # レイアウトの検証
         assert fig.layout.title.text == "テストチャート"
         assert fig.layout.yaxis.title.text == "テスト第1軸"
@@ -70,11 +70,11 @@ class TestPlotManager:
     def test_create_performance_chart(self, sample_financial_data):
         """業績確認チャート作成のテスト"""
         fig = PlotManager.create_performance_chart(sample_financial_data)
-        
+
         # 結果の検証
         assert isinstance(fig, go.Figure)
         assert len(fig.data) == 4  # 売上高、営業利益、純利益、営業利益率の4つのトレース
-        
+
         # レイアウトの検証
         assert fig.layout.title.text == "業績確認"
         assert fig.layout.yaxis.title.text == "金額"
@@ -83,11 +83,11 @@ class TestPlotManager:
     def test_create_per_share_chart(self, sample_financial_data):
         """1株当たりの価値チャート作成のテスト"""
         fig = PlotManager.create_per_share_chart(sample_financial_data)
-        
+
         # 結果の検証
         assert isinstance(fig, go.Figure)
         assert len(fig.data) == 4  # EPS、BPS、DPS、発行済株式数の4つのトレース
-        
+
         # レイアウトの検証
         assert fig.layout.title.text == "1株当たりの価値"
         assert fig.layout.yaxis.title.text == "金額"
@@ -96,11 +96,11 @@ class TestPlotManager:
     def test_create_earning_power_chart(self, sample_financial_data):
         """稼ぐ力チャート作成のテスト"""
         fig = PlotManager.create_earning_power_chart(sample_financial_data)
-        
+
         # 結果の検証
         assert isinstance(fig, go.Figure)
         assert len(fig.data) == 4  # 営業利益、営業CF、EPS、1株あたり営業CFの4つのトレース
-        
+
         # レイアウトの検証
         assert fig.layout.title.text == "稼ぐ力"
         assert fig.layout.yaxis.title.text == "金額"

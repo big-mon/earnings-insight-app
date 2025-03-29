@@ -4,7 +4,6 @@ import pandas as pd
 from datetime import datetime
 from utils.constants import DATE_FORMAT
 
-
 def format_financial_value(value: float) -> str:
     """
     財務数値を見やすい形式にフォーマット
@@ -22,7 +21,6 @@ def format_financial_value(value: float) -> str:
     else:
         return f"¥{value:.2f}"
 
-
 def format_dates(dates: List[datetime]) -> List[str]:
     """
     日付リストをフォーマット
@@ -32,7 +30,6 @@ def format_dates(dates: List[datetime]) -> List[str]:
         List[str]: フォーマットされた日付リスト
     """
     return [pd.to_datetime(date).strftime(DATE_FORMAT) for date in dates]
-
 
 def format_percentage(value: float, decimal_places: int = 1) -> str:
     """
