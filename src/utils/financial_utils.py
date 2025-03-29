@@ -65,6 +65,8 @@ def get_normalized_financial_data(ticker: str, period: str = "quarterly") -> Opt
             "shares": data["発行済株式数"].values,
             "eps": data["EPS"].values,
             "bps": data["BPS"].values,
+            "operating_margin": data["営業利益率"].values,
+            "operating_cash_flow_per_share": data["1株あたり営業CF"].values
         }
 
         # 配当データがある場合は追加

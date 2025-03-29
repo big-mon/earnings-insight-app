@@ -66,6 +66,8 @@ class FinancialData:
 
             # 一株あたり指標の計算
             df["EPS"] = df["純利益"] / df["発行済株式数"]
+            df["営業利益率"] = df["営業利益"] / df["売上高"] * 100
+            df["1株あたり営業CF"] = df["営業キャッシュフロー"] / df["発行済株式数"]
 
             # BPSの計算（純資産 / 発行済株式数）
             stockholder_equity = balance.loc["Total Stockholder Equity"] if "Total Stockholder Equity" in balance.index else None
