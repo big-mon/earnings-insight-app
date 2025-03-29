@@ -1,3 +1,8 @@
-- mainブランチへの直接のコミットは禁止
-- リモートブランチへの直接のコミットは禁止
+# Gitの使用に関して
+- 開発はfeatureブランチで実施
+- mainブランチへの直接プッシュは禁止
 - 適宜コミットを取る
+- プルリクエスト必須
+
+# 利用しているライブラリのドキュメント
+- yfinance https://yfinance-python.org/reference/index.html
