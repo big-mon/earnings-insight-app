@@ -6,13 +6,13 @@ def main():
         page_icon="📈",
         layout="wide"
     )
-    
+
     st.title("Earnings Insight App")
     st.write("米国株式の財務情報分析アプリケーション")
-    
+
     # ティッカーシンボル入力
-    ticker = st.text_input("ティッカーシンボルを入力してください（例：AAPL）", "")
-    
+    ticker = st.text_input("ティッカーシンボルを入力してください（例：AAPL）", "AAPL")
+
     if ticker:
         st.info(f"'{ticker}'の財務データを取得中...")
         # TODO: 財務データの取得と表示機能を実装
