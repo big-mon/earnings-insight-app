@@ -39,19 +39,25 @@ class FinancialData:
 
             # 必要なデータを抽出
             data = {
-                "売上高": financials.loc["Total Revenue"],
-                "営業利益": financials.loc["Operating Income"],
-                "純利益": financials.loc["Net Income"],
-                "営業キャッシュフロー": cashflow.loc["Operating Cash Flow"],
-                "発行済株式数": balance_sheet.loc["Share Issued"],
+                "売上高": financials.loc["Total Revenue"] if "Total Revenue" in financials.index else None,
+                "営業利益": financials.loc["Operating Income"] if "Operating Income" in financials.index else None,
+                "純利益": financials.loc["Net Income"] if "Net Income" in financials.index else None,
+                "営業キャッシュフロー": cashflow.loc["Operating Cash Flow"] if "Operating Cash Flow" in cashflow.index else None,
+                "発行済株式数": balance_sheet.loc["Shares Outstanding"] if "Shares Outstanding" in balance_sheet.index else None,
             }
+
+            # Noneの値をチェック
+            if any(v is None for v in data.values()):
+                missing_items = [k for k, v in data.items() if v is None]
+                print(f"以下の項目が取得できませんでした: {', '.join(missing_items)}")
+                return None
 
             # データフレームに変換
             df = pd.DataFrame(data)
 
             # 一株あたり指標の計算
             df["EPS"] = df["純利益"] / df["発行済株式数"]
-            df["BPS"] = balance_sheet.loc["Total Stockholder Equity"] / df["発行済株式数"]
+            df["BPS"] = (balance_sheet.loc["Total Stockholder Equity"] if "Total Stockholder Equity" in balance_sheet.index else balance_sheet.loc["Total Assets"] - balance_sheet.loc["Total Liabilities Net Minority Interest"]) / df["発行済株式数"]
 
             # インデックスを日付型に変換
             df.index = pd.to_datetime(df.index)
