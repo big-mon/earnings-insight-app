@@ -48,8 +48,17 @@ class PlotManager:
                                 x=formatted_dates,
                                 y=values,
                                 name=name,
-                                mode="lines",
-                                fill="tozeroy",
+                                mode="lines+markers",  # マーカーを追加して時間軸毎の変化を明確に
+                                yaxis="y2"
+                            )
+                        )
+                    elif "配当性向" in name:
+                        fig.add_trace(
+                            go.Scatter(
+                                x=formatted_dates,
+                                y=values,
+                                name=name,
+                                mode="lines+markers",  # マーカーを追加して時間軸毎の変化を明確に
                                 yaxis="y2"
                             )
                         )
@@ -121,37 +130,49 @@ class PlotManager:
         Returns:
             go.Figure: Plotlyのグラフオブジェクト
         """
-        primary_data = {
-            "EPS": data.eps,
-            "BPS": data.bps
-        }
-        
-        # 配当データがある場合は追加
-        if data.dps is not None:
-            primary_data["DPS"] = data.dps
-            
         config = ChartConfig(
             title="1株当たりの価値",
             y1_title="金額",
-            primary_data=primary_data
+            primary_data={
+                "EPS": data.eps,
+                "BPS": data.bps,
+                "DPS": data.dps
+            },
+            y2_title="発行済株式数",
+            secondary_data={
+                "発行済株式数": data.shares
+            }
         )
         
         return PlotManager.create_financial_chart(data.dates, config)
 
     @staticmethod
-    def create_shares_chart(data: FinancialDataModel) -> go.Figure:
+    def create_dividend_chart(data: FinancialDataModel) -> go.Figure:
         """
-        発行済株式数チャートを作成
+        配当チャートを作成
         Args:
             data (FinancialDataModel): 財務データモデル
         Returns:
             go.Figure: Plotlyのグラフオブジェクト
         """
+        # 配当性向の計算（DPS / EPS * 100）
+        payout_ratio = []
+        if data.dps is not None and data.eps is not None:
+            for dps, eps in zip(data.dps, data.eps):
+                if eps != 0:
+                    payout_ratio.append((dps / eps) * 100)
+                else:
+                    payout_ratio.append(0)
+
         config = ChartConfig(
-            title="発行済株式数",
-            y1_title="株式数",
+            title="配当",
+            y1_title="DPS",
             primary_data={
-                "発行済株式数": data.shares
+                "DPS": data.dps
+            },
+            y2_title="配当性向 (%)",
+            secondary_data={
+                "配当性向": payout_ratio
             }
         )
         

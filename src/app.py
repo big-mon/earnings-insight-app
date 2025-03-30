@@ -65,7 +65,7 @@ def main():
                 )
             with cols[1]:
                 st.plotly_chart(
-                    plot_manager.create_shares_chart(financial_data),
+                    plot_manager.create_dividend_chart(financial_data),
                     use_container_width=True
                 )
 
