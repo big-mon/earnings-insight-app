@@ -48,8 +48,8 @@ class PlotManager:
                                 x=formatted_dates,
                                 y=values,
                                 name=name,
-                                mode="lines",
-                                fill="tozeroy",
+                                mode="lines+markers",  # マーカーを追加して変化点を明確に
+                                line={"shape": "hv"},  # 直線的な折れ線に変更
                                 yaxis="y2"
                             )
                         )
@@ -80,7 +80,8 @@ class PlotManager:
                 "yaxis2": {
                     "title": config.y2_title,
                     "overlaying": "y",
-                    "side": "right"
+                    "side": "right",
+                    "autorange": True  # 自動的に範囲を設定
                 }
             })
 
