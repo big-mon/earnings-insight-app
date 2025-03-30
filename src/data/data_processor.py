@@ -1,138 +1,73 @@
 """財務データ処理モジュール"""
 from typing import Dict, List, Optional, Union
 import pandas as pd
-from datetime import datetime
-from data.data_fetcher import DataFetcher
-from utils.models import FinancialDataModel
-from utils.constants import (
-    PERIOD_QUARTERLY, PERIOD_ANNUAL,
-    YF_REVENUE, YF_OPERATING_INCOME, YF_NET_INCOME, YF_OPERATING_CASH_FLOW,
-    YF_STOCKHOLDER_EQUITY, YF_TOTAL_ASSETS, YF_TOTAL_LIABILITIES
-)
+from utils.constants import PERIOD_QUARTERLY, PERIOD_ANNUAL
 
 
 class DataProcessor:
     """財務データ処理クラス"""
 
-    def __init__(self, data_fetcher: DataFetcher):
+    def __init__(self, data_fetcher):
         """
         初期化
         Args:
-            data_fetcher (DataFetcher): データ取得クラスのインスタンス
+            data_fetcher: データ取得クラスのインスタンス
         """
         self.data_fetcher = data_fetcher
 
-    def process_financial_data(self, period: str = PERIOD_QUARTERLY) -> Optional[FinancialDataModel]:
+    def process_financial_data(self, period: str = PERIOD_QUARTERLY) -> Optional[Dict[str, List]]:
         """
         財務データを処理
         Args:
             period (str): "quarterly"（四半期）または"annual"（年次）
         Returns:
-            Optional[FinancialDataModel]: 処理済み財務データモデル
+            Optional[Dict[str, List]]: 処理済み財務データ
         """
-        try:
-            # 財務諸表の取得
-            income = self.data_fetcher.get_income_statement(period)
-            balance = self.data_fetcher.get_balance_sheet(period)
-            cash = self.data_fetcher.get_cash_flow(period)
-            shares = self.data_fetcher.get_shares_outstanding()
+        # 財務諸表を取得
+        income = self.data_fetcher.get_income_statement(period)
+        balance = self.data_fetcher.get_balance_sheet(period)
+        cash = self.data_fetcher.get_cash_flow(period)
+        shares = self.data_fetcher.get_shares_outstanding()
 
-            # データの検証
-            if income is None or balance is None or cash is None or shares is None:
-                print("財務データが不完全です")
-                return None
-
-            # 必要なデータを抽出
-            data = {
-                "売上高": income.loc[YF_REVENUE] if YF_REVENUE in income.index else None,
-                "営業利益": income.loc[YF_OPERATING_INCOME] if YF_OPERATING_INCOME in income.index else None,
-                "純利益": income.loc[YF_NET_INCOME] if YF_NET_INCOME in income.index else None,
-                "営業キャッシュフロー": cash.loc[YF_OPERATING_CASH_FLOW] if YF_OPERATING_CASH_FLOW in cash.index else None,
-            }
-
-            # Noneの値をチェック
-            if any(v is None for v in data.values()):
-                missing_items = [k for k, v in data.items() if v is None]
-                print(f"以下の項目が取得できませんでした: {', '.join(missing_items)}")
-                return None
-
-            # 株式数の設定
-            data["発行済株式数"] = pd.Series([shares] * len(data["売上高"].index), index=data["売上高"].index)
-
-            # データフレームに変換
-            df = pd.DataFrame(data)
-
-            # 一株あたり指標の計算
-            df["EPS"] = df["純利益"] / df["発行済株式数"]
-            df["営業利益率"] = df["営業利益"] / df["売上高"] * 100
-            df["1株あたり営業CF"] = df["営業キャッシュフロー"] / df["発行済株式数"]
-
-            # BPSの計算（純資産 / 発行済株式数）
-            stockholder_equity = balance.loc[YF_STOCKHOLDER_EQUITY] if YF_STOCKHOLDER_EQUITY in balance.index else None
-            if stockholder_equity is not None:
-                df["BPS"] = stockholder_equity / df["発行済株式数"]
-            else:
-                # 代替計算：（総資産 - 総負債）/ 発行済株式数
-                total_assets = balance.loc[YF_TOTAL_ASSETS] if YF_TOTAL_ASSETS in balance.index else None
-                total_liabilities = balance.loc[YF_TOTAL_LIABILITIES] if YF_TOTAL_LIABILITIES in balance.index else None
-
-                if total_assets is not None and total_liabilities is not None:
-                    df["BPS"] = (total_assets - total_liabilities) / df["発行済株式数"]
-                else:
-                    print("BPSの計算に必要なデータが取得できません")
-                    return None
-
-            # 正規化データの作成
-            normalized_data = self._normalize_data(df)
-
-            # 配当データの処理
-            normalized_data = self._process_dividends(normalized_data, period)
-
-            return FinancialDataModel(normalized_data)
-
-        except Exception as e:
-            print(f"財務データの処理中にエラーが発生しました: {str(e)}")
+        # データが取得できない場合はNoneを返す
+        if income is None or balance is None or cash is None or shares is None:
             return None
 
-    def _normalize_data(self, df: pd.DataFrame) -> Dict:
-        """
-        データを正規化
-        Args:
-            df (pd.DataFrame): 財務データフレーム
-        Returns:
-            Dict: 正規化されたデータ（日付昇順でソート済み）
-        """
-        # 日付を変換（タイムゾーンを統一）
-        dates = pd.to_datetime(df.index).tz_localize(None)
-        
-        # 日付でソート
-        df = df.sort_index(ascending=True)
-        dates = dates.sort_values()
+        # 日付順に並び替え
+        income = income.sort_index()
+        balance = balance.sort_index()
+        cash = cash.sort_index()
+
+        # 共通の日付を取得
+        dates = income.index.intersection(balance.index).intersection(cash.index)
 
         # データを正規化
         normalized_data = {
             "dates": dates,
-            "revenue": df["売上高"].values,
-            "operating_income": df["営業利益"].values,
-            "net_income": df["純利益"].values,
-            "operating_cash_flow": df["営業キャッシュフロー"].values,
-            "shares": df["発行済株式数"].values,
-            "eps": df["EPS"].values,
-            "bps": df["BPS"].values,
-            "operating_margin": df["営業利益率"].values,
-            "operating_cash_flow_per_share": df["1株あたり営業CF"].values
+            "revenue": income.loc[dates, "Total Revenue"],
+            "operating_income": income.loc[dates, "Operating Income"],
+            "net_income": income.loc[dates, "Net Income"],
+            "operating_cash_flow": cash.loc[dates, "Operating Cash Flow"],
+            "shares": pd.Series([shares] * len(dates), index=dates),
+            "eps": income.loc[dates, "Net Income"] / shares,
+            "bps": balance.loc[dates, "Stockholders Equity"] / shares,
+            "operating_margin": income.loc[dates, "Operating Income"] / income.loc[dates, "Total Revenue"] * 100,
+            "operating_cash_flow_per_share": cash.loc[dates, "Operating Cash Flow"] / shares,
         }
+
+        # 配当データを処理
+        normalized_data = self._process_dividends(normalized_data, period)
 
         return normalized_data
 
-    def _process_dividends(self, normalized_data: Dict, period: str) -> Dict:
+    def _process_dividends(self, normalized_data: Dict[str, List], period: str) -> Dict[str, List]:
         """
         配当データを処理
         Args:
-            normalized_data (Dict): 正規化されたデータ
+            normalized_data (Dict[str, List]): 正規化済み財務データ
             period (str): "quarterly"（四半期）または"annual"（年次）
         Returns:
-            Dict: 配当データを含む正規化されたデータ
+            Dict[str, List]: 配当データを追加した財務データ
         """
         try:
             # 配当データを取得
@@ -147,7 +82,8 @@ class DataProcessor:
             if period == PERIOD_QUARTERLY:
                 dps = dividends.resample("QE").sum()
             else:
-                dps = dividends.resample("YE").sum()
+                # 年次の場合、各年の配当を合計
+                dps = dividends.groupby(pd.Grouper(freq="A")).sum()
                 
             # インデックスを財務データに合わせる
             dps = dps.reindex(normalized_data["dates"], method="ffill")
