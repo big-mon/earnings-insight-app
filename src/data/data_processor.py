@@ -100,10 +100,14 @@ class DataProcessor:
         Args:
             df (pd.DataFrame): 財務データフレーム
         Returns:
-            Dict: 正規化されたデータ
+            Dict: 正規化されたデータ（日付昇順でソート済み）
         """
         # 日付を変換（タイムゾーンを統一）
         dates = pd.to_datetime(df.index).tz_localize(None)
+        
+        # 日付でソート
+        df = df.sort_index(ascending=True)
+        dates = dates.sort_values()
 
         # データを正規化
         normalized_data = {
