@@ -77,23 +77,23 @@ class DataProcessor:
 
             # 配当データのタイムゾーンを統一
             dividends.index = dividends.index.tz_localize(None)
-            
+
             # 期間に応じて配当データを集計
             if period == PERIOD_QUARTERLY:
                 dps = dividends.resample("QE").sum()
             else:
                 # 年次の場合、各年の配当を合計
-                dps = dividends.groupby(pd.Grouper(freq="A")).sum()
-                
+                dps = dividends.resample("YE").sum()
+
             # インデックスを財務データに合わせる
             dps = dps.reindex(normalized_data["dates"], method="ffill")
-            
+
             # 配当データを追加
             if not dps.empty:
                 normalized_data["dps"] = dps.values
-                
+
             return normalized_data
-            
+
         except Exception as e:
             print(f"配当データの処理中にエラーが発生しました: {str(e)}")
             return normalized_data
