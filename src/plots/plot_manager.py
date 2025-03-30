@@ -202,3 +202,107 @@ class PlotManager:
         )
         
         return PlotManager.create_financial_chart(data.dates, config)
+
+    @staticmethod
+    def create_earning_power_profit_chart(data: FinancialDataModel) -> go.Figure:
+        """
+        稼ぐ力（利益）チャートを作成
+        Args:
+            data (FinancialDataModel): 財務データモデル
+        Returns:
+            go.Figure: Plotlyのグラフオブジェクト
+        """
+        config = ChartConfig(
+            title="営業利益とCF",
+            y1_title="金額",
+            primary_data={
+                "営業利益": data.operating_income,
+                "営業CF": data.operating_cash_flow
+            }
+        )
+        return PlotManager.create_financial_chart(data.dates, config)
+
+    @staticmethod
+    def create_earning_power_per_share_chart(data: FinancialDataModel) -> go.Figure:
+        """
+        稼ぐ力（1株当たり）チャートを作成
+        Args:
+            data (FinancialDataModel): 財務データモデル
+        Returns:
+            go.Figure: Plotlyのグラフオブジェクト
+        """
+        config = ChartConfig(
+            title="1株当たり指標",
+            y1_title="金額",
+            primary_data={
+                "EPS": data.eps,
+                "1株あたり営業CF": data.operating_cash_flow_per_share
+            }
+        )
+        return PlotManager.create_financial_chart(data.dates, config)
+
+    @staticmethod
+    def create_earning_power_margin_chart(data: FinancialDataModel) -> go.Figure:
+        """
+        稼ぐ力（マージン）チャートを作成
+        Args:
+            data (FinancialDataModel): 財務データモデル
+        Returns:
+            go.Figure: Plotlyのグラフオブジェクト
+        """
+        # FCFマージンの計算
+        fcf_margin = None
+        if data.operating_cash_flow is not None and data.revenue is not None:
+            fcf_margin = data.operating_cash_flow / data.revenue * 100
+
+        fig = go.Figure()
+
+        # 日付のフォーマットを変更
+        formatted_dates = format_dates(data.dates)
+
+        # マージン指標を追加
+        fig.add_trace(
+            go.Scatter(
+                x=formatted_dates,
+                y=data.operating_margin,
+                name="営業利益率",
+                mode="lines"
+            )
+        )
+
+        # 営業CFマージンを計算して追加
+        if data.operating_cash_flow is not None and data.revenue is not None:
+            cf_margin = data.operating_cash_flow / data.revenue * 100
+            fig.add_trace(
+                go.Scatter(
+                    x=formatted_dates,
+                    y=cf_margin,
+                    name="営業CFマージン",
+                    mode="lines"
+                )
+            )
+
+        # FCFマージンを追加
+        if fcf_margin is not None:
+            fig.add_trace(
+                go.Scatter(
+                    x=formatted_dates,
+                    y=fcf_margin,
+                    name="FCFマージン",
+                    mode="lines"
+                )
+            )
+
+        # 15%の参考線を追加
+        fig.add_hline(y=15, line_dash="dash", line_color="gray", annotation_text="15%")
+
+        # レイアウトの設定
+        fig.update_layout(
+            title="収益性指標",
+            xaxis={"title": "日付"},
+            yaxis={"title": "マージン (%)"},
+            showlegend=True,
+            legend={"orientation": "h", "yanchor": "bottom", "y": 1.02, "xanchor": "right", "x": 1}
+        )
+
+        return fig

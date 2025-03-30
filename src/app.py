@@ -71,10 +71,22 @@ def main():
 
             # 稼ぐ力グラフ
             st.subheader("稼ぐ力グラフ")
-            st.plotly_chart(
-                plot_manager.create_earning_power_chart(financial_data),
-                use_container_width=True
-            )
+            cols = st.columns(3)
+            with cols[0]:
+                st.plotly_chart(
+                    plot_manager.create_earning_power_profit_chart(financial_data),
+                    use_container_width=True
+                )
+            with cols[1]:
+                st.plotly_chart(
+                    plot_manager.create_earning_power_per_share_chart(financial_data),
+                    use_container_width=True
+                )
+            with cols[2]:
+                st.plotly_chart(
+                    plot_manager.create_earning_power_margin_chart(financial_data),
+                    use_container_width=True
+                )
 
             # 最新の財務指標
             st.subheader("最新の財務指標")
