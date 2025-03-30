@@ -133,9 +133,24 @@ class PlotManager:
         config = ChartConfig(
             title="1株当たりの価値",
             y1_title="金額",
-            primary_data=primary_data,
-            y2_title="発行済株式数",
-            secondary_data={
+            primary_data=primary_data
+        )
+        
+        return PlotManager.create_financial_chart(data.dates, config)
+
+    @staticmethod
+    def create_shares_chart(data: FinancialDataModel) -> go.Figure:
+        """
+        発行済株式数チャートを作成
+        Args:
+            data (FinancialDataModel): 財務データモデル
+        Returns:
+            go.Figure: Plotlyのグラフオブジェクト
+        """
+        config = ChartConfig(
+            title="発行済株式数",
+            y1_title="株式数",
+            primary_data={
                 "発行済株式数": data.shares
             }
         )
