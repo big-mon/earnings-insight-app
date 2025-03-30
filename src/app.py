@@ -49,18 +49,28 @@ def main():
             plot_manager = PlotManager()
 
             # 業績確認グラフ
+            st.subheader("業績確認グラフ")
             st.plotly_chart(
                 plot_manager.create_performance_chart(financial_data),
                 use_container_width=True
             )
 
             # 1株当たりの価値グラフ
-            st.plotly_chart(
-                plot_manager.create_per_share_chart(financial_data),
-                use_container_width=True
-            )
+            st.subheader("1株当たりの価値グラフ")
+            cols = st.columns(2)
+            with cols[0]:
+                st.plotly_chart(
+                    plot_manager.create_per_share_chart(financial_data),
+                    use_container_width=True
+                )
+            with cols[1]:
+                st.plotly_chart(
+                    plot_manager.create_shares_chart(financial_data),
+                    use_container_width=True
+                )
 
             # 稼ぐ力グラフ
+            st.subheader("稼ぐ力グラフ")
             st.plotly_chart(
                 plot_manager.create_earning_power_chart(financial_data),
                 use_container_width=True
