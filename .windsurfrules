@@ -3,8 +3,14 @@
 - 開発はfeatureブランチで実施
 - mainブランチへの直接プッシュは禁止
 - 変更後は適時にコミット
-- プルリクエスト必須
+
+## GitHubリポジトリ
+- リポジトリ名: `earnings-insight-app`
+- URL: `https://github.com/big-mon/earnings-insight-app`
+- リモートブランチ: `origin`
 - リモートブランチへの直接コミット禁止
+- リモートブランチへの直接プッシュ禁止
+- プルリクエスト必須
 
 ## コミットメッセージ
 - フォーマット: `<type>: <subject>`
