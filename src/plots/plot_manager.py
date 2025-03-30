@@ -133,7 +133,11 @@ class PlotManager:
         config = ChartConfig(
             title="1株当たりの価値",
             y1_title="金額",
-            primary_data=primary_data
+            primary_data=primary_data,
+            y2_title="株式数",
+            secondary_data={
+                "発行済株式数": data.shares
+            }
         )
         
         return PlotManager.create_financial_chart(data.dates, config)
@@ -147,13 +151,31 @@ class PlotManager:
         Returns:
             go.Figure: Plotlyのグラフオブジェクト
         """
-        config = ChartConfig(
-            title="発行済株式数",
-            y1_title="株式数",
-            primary_data={
-                "発行済株式数": data.shares
-            }
-        )
+        primary_data = {
+            "発行済株式数": data.shares
+        }
+        
+        # 配当データがある場合は追加
+        if data.dps is not None:
+            # 配当性向を計算（DPS / EPS * 100）
+            payout_ratio = [
+                (d / e * 100) if e != 0 else 0
+                for d, e in zip(data.dps, data.eps)
+            ]
+            
+            config = ChartConfig(
+                title="配当と配当性向",
+                y1_title="金額",
+                primary_data={"DPS": data.dps},
+                y2_title="配当性向 (%)",
+                secondary_data={"配当性向": payout_ratio}
+            )
+        else:
+            config = ChartConfig(
+                title="発行済株式数",
+                y1_title="株式数",
+                primary_data=primary_data
+            )
         
         return PlotManager.create_financial_chart(data.dates, config)
 
