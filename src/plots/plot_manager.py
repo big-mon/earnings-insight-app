@@ -112,19 +112,14 @@ class PlotManager:
             go.Figure: Plotlyのグラフオブジェクト
         """
         config = ChartConfig(
-            title="業績確認",
+            title="業績推移",
             y1_title="金額",
             primary_data={
                 "売上高": data.revenue,
                 "営業利益": data.operating_income,
-                "純利益": data.net_income
-            },
-            y2_title="マージン (%)",
-            secondary_data={
-                "営業利益率": data.operating_margin
+                "当期純利益": data.net_income
             }
         )
-
         return PlotManager.create_financial_chart(data.dates, config)
 
     @staticmethod
@@ -137,19 +132,13 @@ class PlotManager:
             go.Figure: Plotlyのグラフオブジェクト
         """
         config = ChartConfig(
-            title="1株当たりの価値",
+            title="1株当たり価値",
             y1_title="金額",
             primary_data={
                 "EPS": data.eps,
-                "BPS": data.bps,
-                "DPS": data.dps
-            },
-            y2_title="発行済株式数",
-            secondary_data={
-                "発行済株式数": data.shares
+                "BPS": data.bps
             }
         )
-
         return PlotManager.create_financial_chart(data.dates, config)
 
     @staticmethod
@@ -161,26 +150,18 @@ class PlotManager:
         Returns:
             go.Figure: Plotlyのグラフオブジェクト
         """
-        # 配当性向の計算（DPS / EPS * 100）
-        payout_ratio = []
-        if data.dps is not None and data.eps is not None:
-            for dps, eps in zip(data.dps, data.eps):
-                if eps != 0:
-                    payout_ratio.append((dps / eps) * 100)
-                else:
-                    payout_ratio.append(0)
-
         config = ChartConfig(
             title="配当",
             y1_title="金額",
             primary_data={
-                "DPS": data.dps
+                "1株配当金": data.dividend_per_share
             },
             y2_title="配当性向 (%)",
             secondary_data={
-                "配当性向": payout_ratio
+                "配当性向": data.payout_ratio
             }
         )
+
         return PlotManager.create_financial_chart(data.dates, config)
 
     @staticmethod
@@ -221,7 +202,10 @@ class PlotManager:
             title="営業利益とCF",
             y1_title="金額",
             primary_data={
-                "営業利益": data.operating_income,
+                "営業利益": data.operating_income
+            },
+            y2_title="金額",
+            secondary_data={
                 "営業CF": data.operating_cash_flow
             }
         )
@@ -240,7 +224,10 @@ class PlotManager:
             title="1株当たり指標",
             y1_title="金額",
             primary_data={
-                "EPS": data.eps,
+                "EPS": data.eps
+            },
+            y2_title="金額",
+            secondary_data={
                 "1株あたり営業CF": data.operating_cash_flow_per_share
             }
         )
