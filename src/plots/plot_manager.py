@@ -217,15 +217,31 @@ class PlotManager:
         Returns:
             go.Figure: Plotlyのグラフオブジェクト
         """
-        config = ChartConfig(
+        fig = go.Figure()
+        formatted_dates = format_dates(data.dates)
+
+        fig.add_trace(go.Bar(
+            x=formatted_dates,
+            y=data.operating_income,
+            name="営業利益"
+        ))
+
+        fig.add_trace(go.Scatter(
+            x=formatted_dates,
+            y=data.operating_cash_flow,
+            name="営業CF",
+            mode="lines+markers"
+        ))
+
+        fig.update_layout(
             title="営業利益とCF",
-            y1_title="金額",
-            primary_data={
-                "営業利益": data.operating_income,
-                "営業CF": data.operating_cash_flow
-            }
+            yaxis_title="金額",
+            xaxis_title="日付",
+            showlegend=True,
+            legend={"orientation": "h", "yanchor": "bottom", "y": 1.02, "xanchor": "right", "x": 1}
         )
-        return PlotManager.create_financial_chart(data.dates, config)
+
+        return fig
 
     @staticmethod
     def create_earning_power_per_share_chart(data: FinancialDataModel) -> go.Figure:
@@ -236,15 +252,31 @@ class PlotManager:
         Returns:
             go.Figure: Plotlyのグラフオブジェクト
         """
-        config = ChartConfig(
+        fig = go.Figure()
+        formatted_dates = format_dates(data.dates)
+
+        fig.add_trace(go.Bar(
+            x=formatted_dates,
+            y=data.eps,
+            name="EPS"
+        ))
+
+        fig.add_trace(go.Scatter(
+            x=formatted_dates,
+            y=data.operating_cash_flow_per_share,
+            name="営業CF/株",
+            mode="lines+markers"
+        ))
+
+        fig.update_layout(
             title="1株当たり指標",
-            y1_title="金額",
-            primary_data={
-                "EPS": data.eps,
-                "1株あたり営業CF": data.operating_cash_flow_per_share
-            }
+            yaxis_title="$/株",
+            xaxis_title="日付",
+            showlegend=True,
+            legend={"orientation": "h", "yanchor": "bottom", "y": 1.02, "xanchor": "right", "x": 1}
         )
-        return PlotManager.create_financial_chart(data.dates, config)
+
+        return fig
 
     @staticmethod
     def create_earning_power_margin_chart(data: FinancialDataModel) -> go.Figure:
@@ -300,6 +332,9 @@ class PlotManager:
 
         # 15%の参考線を追加
         fig.add_hline(y=15, line_dash="dash", line_color="gray", annotation_text="15%")
+
+        # 0%の参考線を追加
+        fig.add_hline(y=0, line_color="gray")
 
         # レイアウトの設定
         fig.update_layout(
