@@ -236,15 +236,31 @@ class PlotManager:
         Returns:
             go.Figure: Plotlyのグラフオブジェクト
         """
-        config = ChartConfig(
+        fig = go.Figure()
+        formatted_dates = format_dates(data.dates)
+
+        fig.add_trace(go.Bar(
+            x=formatted_dates,
+            y=data.eps,
+            name="EPS"
+        ))
+
+        fig.add_trace(go.Scatter(
+            x=formatted_dates,
+            y=data.operating_cash_flow_per_share,
+            name="営業CF/株",
+            mode="lines+markers"
+        ))
+
+        fig.update_layout(
             title="1株当たり指標",
-            y1_title="金額",
-            primary_data={
-                "EPS": data.eps,
-                "1株あたり営業CF": data.operating_cash_flow_per_share
-            }
+            showlegend=True,
+            yaxis_title="$/株",
+            xaxis_title="日付",
+            legend={"orientation": "h", "yanchor": "bottom", "y": 1.02, "xanchor": "right", "x": 1}
         )
-        return PlotManager.create_financial_chart(data.dates, config)
+
+        return fig
 
     @staticmethod
     def create_earning_power_margin_chart(data: FinancialDataModel) -> go.Figure:
