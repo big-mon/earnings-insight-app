@@ -2,14 +2,12 @@
 ## Git運用
 - 開発はfeatureブランチで実施
 - mainブランチへの直接プッシュは禁止
-- 変更後は適時にコミット
+- 変更内容は適宜ローカルブランチへコミットし、プッシュ
 
 ## GitHubリポジトリ
 - リポジトリ名: `earnings-insight-app`
 - URL: `https://github.com/big-mon/earnings-insight-app`
 - リモートブランチ: `origin`
-- リモートブランチへの直接コミット禁止
-- リモートブランチへの直接プッシュ禁止
 - プルリクエスト必須
 
 ## コミットメッセージ
