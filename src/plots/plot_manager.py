@@ -237,6 +237,7 @@ class PlotManager:
             title="営業利益とCF",
             yaxis_title="金額",
             xaxis_title="日付",
+            showlegend=True,
             legend={"orientation": "h", "yanchor": "bottom", "y": 1.02, "xanchor": "right", "x": 1}
         )
 
@@ -269,9 +270,9 @@ class PlotManager:
 
         fig.update_layout(
             title="1株当たり指標",
-            showlegend=True,
             yaxis_title="$/株",
             xaxis_title="日付",
+            showlegend=True,
             legend={"orientation": "h", "yanchor": "bottom", "y": 1.02, "xanchor": "right", "x": 1}
         )
 
