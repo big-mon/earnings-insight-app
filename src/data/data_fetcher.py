@@ -106,3 +106,35 @@ class DataFetcher:
         except Exception as e:
             print(f"配当データの取得に失敗しました: {str(e)}")
             return None
+
+    def get_shares_outstanding_history(self, period: str = PERIOD_QUARTERLY) -> Optional[pd.Series]:
+        """
+        発行済株式数の履歴を取得
+        Args:
+            period (str): "quarterly"（四半期）または"annual"（年次）
+        Returns:
+            Optional[pd.Series]: 発行済株式数の履歴
+        """
+        try:
+            # 貸借対照表から株式数を取得
+            balance = self.stock.balance_sheet if period == PERIOD_ANNUAL else self.stock.quarterly_balance_sheet
+            if balance.empty:
+                print(f"貸借対照表が取得できませんでした: {self.ticker}")
+                return None
+
+            # 株式数を取得（ShareIssued または CommonStockSharesOutstanding から）
+            shares = None
+            if "ShareIssued" in balance.index:
+                shares = balance.loc["ShareIssued"]
+            elif "CommonStockSharesOutstanding" in balance.index:
+                shares = balance.loc["CommonStockSharesOutstanding"]
+
+            if shares is None or shares.empty:
+                print(f"発行済株式数の履歴が取得できませんでした: {self.ticker}")
+                return None
+
+            return shares
+
+        except Exception as e:
+            print(f"発行済株式数の履歴の取得に失敗しました: {str(e)}")
+            return None

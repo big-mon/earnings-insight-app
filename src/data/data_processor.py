@@ -56,8 +56,15 @@ class DataProcessor:
                 print(f"以下の項目が取得できませんでした: {', '.join(missing_items)}")
                 return None
 
-            # 株式数の設定
-            data["発行済株式数"] = pd.Series([shares] * len(data["売上高"].index), index=data["売上高"].index)
+            # 株式数の設定（各時点の値を取得）
+            shares_data = self.data_fetcher.get_shares_outstanding_history(period)
+            if shares_data is None:
+                print("株式数の履歴データが取得できませんでした")
+                return None
+            
+            # 株式数データのインデックスをfinancial dataのインデックスに合わせる
+            shares_data = shares_data.reindex(data["売上高"].index, method="ffill")
+            data["発行済株式数"] = shares_data
 
             # データフレームに変換
             df = pd.DataFrame(data)
