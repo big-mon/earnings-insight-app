@@ -124,7 +124,7 @@ class PlotManager:
                 "営業利益率": data.operating_margin
             }
         )
-        
+
         return PlotManager.create_financial_chart(data.dates, config)
 
     @staticmethod
@@ -149,7 +149,7 @@ class PlotManager:
                 "発行済株式数": data.shares
             }
         )
-        
+
         return PlotManager.create_financial_chart(data.dates, config)
 
     @staticmethod
@@ -161,6 +161,15 @@ class PlotManager:
         Returns:
             go.Figure: Plotlyのグラフオブジェクト
         """
+        # 配当性向の計算（DPS / EPS * 100）
+        payout_ratio = []
+        if data.dps is not None and data.eps is not None:
+            for dps, eps in zip(data.dps, data.eps):
+                if eps != 0:
+                    payout_ratio.append((dps / eps) * 100)
+                else:
+                    payout_ratio.append(0)
+
         config = ChartConfig(
             title="配当",
             y1_title="金額",
@@ -169,7 +178,7 @@ class PlotManager:
             },
             y2_title="配当性向 (%)",
             secondary_data={
-                "配当性向": data.payout_ratio
+                "配当性向": payout_ratio
             }
         )
         return PlotManager.create_financial_chart(data.dates, config)
@@ -196,7 +205,7 @@ class PlotManager:
                 "1株あたり営業CF": data.operating_cash_flow_per_share
             }
         )
-        
+
         return PlotManager.create_financial_chart(data.dates, config)
 
     @staticmethod
