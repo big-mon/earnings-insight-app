@@ -35,7 +35,7 @@ class DataProcessor:
             income = self.data_fetcher.get_income_statement(period)
             balance = self.data_fetcher.get_balance_sheet(period)
             cash = self.data_fetcher.get_cash_flow(period)
-            shares = self.data_fetcher.get_shares_outstanding()
+            shares = self.data_fetcher.get_shares_outstanding(period)
 
             # データの検証
             if income is None or balance is None or cash is None or shares is None:
@@ -57,7 +57,7 @@ class DataProcessor:
                 return None
 
             # 株式数の設定
-            data["発行済株式数"] = pd.Series([shares] * len(data["売上高"].index), index=data["売上高"].index)
+            data["発行済株式数"] = shares
 
             # データフレームに変換
             df = pd.DataFrame(data)

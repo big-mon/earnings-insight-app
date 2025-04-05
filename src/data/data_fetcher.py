@@ -75,20 +75,30 @@ class DataFetcher:
             print(f"キャッシュフロー計算書の取得に失敗しました: {str(e)}")
             return None
 
-    def get_shares_outstanding(self) -> Optional[int]:
+    def get_shares_outstanding(self, period: str = PERIOD_QUARTERLY) -> Optional[pd.Series]:
         """
-        発行済株式数を取得
+        希薄化後発行済株式数を取得
+        Args:
+            period (str): "quarterly"（四半期）または"annual"（年次）
         Returns:
-            Optional[int]: 発行済株式数
+            Optional[pd.Series]: 希薄化後発行済株式数
         """
         try:
-            shares = self.stock.info.get("sharesOutstanding")
-            if not shares:
-                print(f"発行済株式数が取得できませんでした: {self.ticker}")
+            # 損益計算書から希薄化後発行済株式数を取得
+            income = self.stock.income_stmt if period == PERIOD_ANNUAL else self.stock.quarterly_income_stmt
+            if income.empty:
+                print(f"損益計算書が取得できませんでした: {self.ticker}")
                 return None
-            return shares
+
+            # 希薄化後発行済株式数を取得
+            if "Diluted Average Shares" in income.index:
+                shares = income.loc["Diluted Average Shares"]
+                return shares
+            else:
+                print(f"希薄化後発行済株式数が取得できませんでした: {self.ticker}")
+                return None
         except Exception as e:
-            print(f"発行済株式数の取得に失敗しました: {str(e)}")
+            print(f"希薄化後発行済株式数の取得に失敗しました: {str(e)}")
             return None
 
     def get_dividends(self) -> Optional[pd.Series]:
