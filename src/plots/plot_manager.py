@@ -52,6 +52,12 @@ class PlotManager:
                                 yaxis="y2"
                             )
                         )
+                        # 発行済株式数の軸範囲を0から設定
+                        fig.update_layout(
+                            yaxis2={
+                                "rangemode": "tozero"
+                            }
+                        )
                     elif "配当性向" in name:
                         fig.add_trace(
                             go.Scatter(
@@ -113,7 +119,7 @@ class PlotManager:
                 "営業利益": data.operating_income,
                 "純利益": data.net_income
             },
-            y2_title="営業利益率 (%)",
+            y2_title="マージン (%)",
             secondary_data={
                 "営業利益率": data.operating_margin
             }
@@ -155,27 +161,17 @@ class PlotManager:
         Returns:
             go.Figure: Plotlyのグラフオブジェクト
         """
-        # 配当性向の計算（DPS / EPS * 100）
-        payout_ratio = []
-        if data.dps is not None and data.eps is not None:
-            for dps, eps in zip(data.dps, data.eps):
-                if eps != 0:
-                    payout_ratio.append((dps / eps) * 100)
-                else:
-                    payout_ratio.append(0)
-
         config = ChartConfig(
             title="配当",
-            y1_title="DPS",
+            y1_title="金額",
             primary_data={
                 "DPS": data.dps
             },
             y2_title="配当性向 (%)",
             secondary_data={
-                "配当性向": payout_ratio
+                "配当性向": data.payout_ratio
             }
         )
-        
         return PlotManager.create_financial_chart(data.dates, config)
 
     @staticmethod
