@@ -332,6 +332,9 @@ class PlotManager:
         # 15%の参考線を追加
         fig.add_hline(y=15, line_dash="dash", line_color="gray", annotation_text="15%")
 
+        # 0%の参考線を追加
+        fig.add_hline(y=0, line_color="gray")
+
         # レイアウトの設定
         fig.update_layout(
             title="収益性指標",
