@@ -76,8 +76,7 @@ class DataProcessor:
             # 投下資本 = 有利子負債 + 株主資本
             df["NOPAT"] = df["営業利益"] * (1 - df["実効税率"])
             df["投下資本"] = df["有利子負債"] + df["株主資本"]
-            df["ROIC"] = (df["NOPAT"] / df["投下資本"]) * 100
-
+            df["ROIC"] = df.apply(lambda row: (row["NOPAT"] / row["投下資本"]) * 100 if row["投下資本"] != 0 else None, axis=1)
             # BPSの計算（純資産 / 発行済株式数）
             stockholder_equity = balance.loc[YF_STOCKHOLDER_EQUITY] if YF_STOCKHOLDER_EQUITY in balance.index else None
             if stockholder_equity is not None:
