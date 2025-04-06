@@ -71,7 +71,7 @@ def main():
 
             # 稼ぐ力グラフ
             st.subheader("稼ぐ力グラフ")
-            cols = st.columns(4)
+            cols = st.columns(2)
             with cols[0]:
                 st.plotly_chart(
                     plot_manager.create_earning_power_profit_chart(financial_data),
@@ -82,12 +82,14 @@ def main():
                     plot_manager.create_earning_power_per_share_chart(financial_data),
                     use_container_width=True
                 )
-            with cols[2]:
+
+            cols = st.columns(2)
+            with cols[0]:
                 st.plotly_chart(
                     plot_manager.create_earning_power_margin_chart(financial_data),
                     use_container_width=True
                 )
-            with cols[3]:
+            with cols[1]:
                 st.plotly_chart(
                     plot_manager.create_roic_chart(financial_data),
                     use_container_width=True
