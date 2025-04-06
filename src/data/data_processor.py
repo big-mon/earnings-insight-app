@@ -7,7 +7,8 @@ from utils.models import FinancialDataModel
 from utils.constants import (
     PERIOD_QUARTERLY, PERIOD_ANNUAL,
     YF_REVENUE, YF_OPERATING_INCOME, YF_NET_INCOME, YF_OPERATING_CASH_FLOW,
-    YF_STOCKHOLDER_EQUITY, YF_TOTAL_ASSETS, YF_TOTAL_LIABILITIES
+    YF_STOCKHOLDER_EQUITY, YF_TOTAL_ASSETS, YF_TOTAL_LIABILITIES,
+    YF_TOTAL_DEBT, YF_TAX_RATE
 )
 
 
@@ -48,6 +49,9 @@ class DataProcessor:
                 "営業利益": income.loc[YF_OPERATING_INCOME] if YF_OPERATING_INCOME in income.index else None,
                 "純利益": income.loc[YF_NET_INCOME] if YF_NET_INCOME in income.index else None,
                 "営業キャッシュフロー": cash.loc[YF_OPERATING_CASH_FLOW] if YF_OPERATING_CASH_FLOW in cash.index else None,
+                "実効税率": income.loc[YF_TAX_RATE] if YF_TAX_RATE in income.index else None,
+                "有利子負債": balance.loc[YF_TOTAL_DEBT] if YF_TOTAL_DEBT in balance.index else None,
+                "株主資本": balance.loc[YF_STOCKHOLDER_EQUITY] if YF_STOCKHOLDER_EQUITY in balance.index else None,
             }
 
             # Noneの値をチェック
@@ -66,6 +70,13 @@ class DataProcessor:
             df["EPS"] = df["純利益"] / df["発行済株式数"]
             df["営業利益率"] = df["営業利益"] / df["売上高"] * 100
             df["1株あたり営業CF"] = df["営業キャッシュフロー"] / df["発行済株式数"]
+
+            # ROICの計算
+            # NOPAT = 営業利益 × (1 - 実効税率)
+            # 投下資本 = 有利子負債 + 株主資本
+            df["NOPAT"] = df["営業利益"] * (1 - df["実効税率"])
+            df["投下資本"] = df["有利子負債"] + df["株主資本"]
+            df["ROIC"] = (df["NOPAT"] / df["投下資本"]) * 100
 
             # BPSの計算（純資産 / 発行済株式数）
             stockholder_equity = balance.loc[YF_STOCKHOLDER_EQUITY] if YF_STOCKHOLDER_EQUITY in balance.index else None
@@ -120,7 +131,8 @@ class DataProcessor:
             "eps": df["EPS"].values,
             "bps": df["BPS"].values,
             "operating_margin": df["営業利益率"].values,
-            "operating_cash_flow_per_share": df["1株あたり営業CF"].values
+            "operating_cash_flow_per_share": df["1株あたり営業CF"].values,
+            "roic": df["ROIC"].values
         }
 
         return normalized_data

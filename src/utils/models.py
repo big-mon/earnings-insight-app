@@ -15,6 +15,7 @@ class FinancialDataModel:
     bps: List[float]
     operating_margin: List[float]
     operating_cash_flow_per_share: List[float]
+    roic: List[float]
     dps: Optional[List[float]] = None
 
     def __init__(self, data: Dict[str, List]):
@@ -33,6 +34,7 @@ class FinancialDataModel:
         self.bps = data.get("bps", [])
         self.operating_margin = data.get("operating_margin", [])
         self.operating_cash_flow_per_share = data.get("operating_cash_flow_per_share", [])
+        self.roic = data.get("roic", [])
         self.dps = data.get("dps", None)
 
     def to_dict(self) -> Dict[str, List]:
@@ -51,7 +53,8 @@ class FinancialDataModel:
             "eps": self.eps,
             "bps": self.bps,
             "operating_margin": self.operating_margin,
-            "operating_cash_flow_per_share": self.operating_cash_flow_per_share
+            "operating_cash_flow_per_share": self.operating_cash_flow_per_share,
+            "roic": self.roic
         }
 
         if self.dps is not None:
