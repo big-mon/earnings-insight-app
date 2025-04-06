@@ -15,15 +15,18 @@ KEY_BPS = "BPS"
 KEY_OPERATING_MARGIN = "営業利益率"
 KEY_OPERATING_CASH_FLOW_PER_SHARE = "1株あたり営業CF"
 KEY_DPS = "DPS"
+KEY_ROIC = "ROIC"
 
 # 財務諸表キー（yfinance）
 YF_REVENUE = "Total Revenue"
 YF_OPERATING_INCOME = "Operating Income"
 YF_NET_INCOME = "Net Income"
 YF_OPERATING_CASH_FLOW = "Operating Cash Flow"
-YF_STOCKHOLDER_EQUITY = "Total Stockholder Equity"
+YF_STOCKHOLDER_EQUITY = "Stockholders Equity"
 YF_TOTAL_ASSETS = "Total Assets"
 YF_TOTAL_LIABILITIES = "Total Liabilities Net Minority Interest"
+YF_TOTAL_DEBT = "Total Debt"
+YF_TAX_RATE = "Tax Rate For Calcs"
 
 # エラーメッセージ
 ERROR_DATA_FETCH = "財務データの取得に失敗しました。ティッカーシンボルを確認してください。"

@@ -346,3 +346,44 @@ class PlotManager:
         )
 
         return fig
+
+    @staticmethod
+    def create_roic_chart(data: FinancialDataModel) -> go.Figure:
+        """
+        ROICチャートを作成
+        Args:
+            data (FinancialDataModel): 財務データモデル
+        Returns:
+            go.Figure: Plotlyのグラフオブジェクト
+        """
+        fig = go.Figure()
+
+        # 日付のフォーマットを変更
+        formatted_dates = format_dates(data.dates)
+
+        # ROICを追加
+        fig.add_trace(
+            go.Scatter(
+                x=formatted_dates,
+                y=data.roic,
+                name="ROIC",
+                mode="lines+markers"
+            )
+        )
+
+        # 10%の参考線を追加
+        fig.add_hline(y=10, line_dash="dash", line_color="gray", annotation_text="10%")
+
+        # 0%の参考線を追加
+        fig.add_hline(y=0, line_color="gray")
+
+        # レイアウトの設定
+        fig.update_layout(
+            title="投下資本利益率（ROIC）",
+            xaxis={"title": "日付"},
+            yaxis={"title": "ROIC (%)"},
+            showlegend=True,
+            legend={"orientation": "h", "yanchor": "bottom", "y": 1.02, "xanchor": "right", "x": 1}
+        )
+
+        return fig
